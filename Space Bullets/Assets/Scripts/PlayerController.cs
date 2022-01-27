@@ -5,6 +5,9 @@ using StarterAssets;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] Transform aimParent;
+    [SerializeField] Transform aimSon;
+    [SerializeField] Transform targetParent;
     [SerializeField] Transform target;
     [SerializeField] Transform spawnBulletPosition;
     [SerializeField] Transform bulletPF;
@@ -12,6 +15,8 @@ public class PlayerController : MonoBehaviour
 
     private bool fireGun = false;
     private bool isFiring = false;
+
+    public Vector2 lookInput;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +27,16 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //Aiming Gun
+        lookInput = input.look;
+        if(lookInput != Vector2.zero)
+        {
+            float inputAngle = Mathf.Atan2(lookInput.y,lookInput.x) * Mathf.Rad2Deg;
+            aimParent.rotation = Quaternion.Euler(0, 0, inputAngle);
+            Vector3 targetParentPos = new Vector3(aimSon.position.x, aimSon.position.y, targetParent.position.z);
+            targetParent.position = targetParentPos;
+        }
+        
         //Firing Gun
         fireGun = input.fire;
         if(fireGun && !isFiring)
