@@ -13,6 +13,7 @@ namespace StarterAssets
 		public bool jump;
 		public bool sprint;
         public bool fire;
+        public bool jet;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -48,6 +49,11 @@ namespace StarterAssets
 		{
 			FireInput(value.isPressed);
 		}
+
+        public void OnJet(InputValue value)
+		{
+			JetInput(value.isPressed);
+		}
 #else
         // old input sys if we do decide to have it (most likely wont)...
 #endif
@@ -76,6 +82,11 @@ namespace StarterAssets
         public void FireInput(bool newFireState)
         {
             fire = newFireState;
+        }
+
+        public void JetInput(bool newJetState)
+        {
+            jet = newJetState;
         }
 
 #if !UNITY_IOS || !UNITY_ANDROID
