@@ -15,12 +15,15 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] StarterAssetsInputs input;
 	[SerializeField] ImpactReceiver impactReceiver;
 
-	[SerializeField] float mainThrust = 1000f;
+	[SerializeField] float mainThrust = 4f;
+	[SerializeField] float gunRecoil = 40f;
 	[SerializeField] Transform jetPack;
 	[SerializeField] ParticleSystem mainEngineParticles;
 	[SerializeField] AudioClip thrustAudio;
+	[SerializeField] AudioClip gunAudio;
 
-	AudioSource audioSource;
+	[SerializeField] AudioSource audioSourceJet;
+	[SerializeField] AudioSource audioSourceGun;
 	private bool fireGun = false;
 	private bool isFiring = false;
 
@@ -32,7 +35,7 @@ public class PlayerController : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		audioSource = GetComponent<AudioSource>();
+		//audioSourceJet = GetComponent<AudioSource>();
 	}
 
 	// Update is called once per frame
@@ -43,21 +46,21 @@ public class PlayerController : MonoBehaviour
 		if(lookInput != Vector2.zero)
 		{
 			bool lookingLeft = (gameObject.transform.eulerAngles.y > 269);
-			Debug.Log("lookingleft: " + lookingLeft);
+			//Debug.Log("lookingleft: " + lookingLeft);
 			bool lookingRight = (gameObject.transform.eulerAngles.y < 91);
-			Debug.Log("eulerangles.y: " + gameObject.transform.eulerAngles.y);
-			Debug.Log("lookingRight: " + lookingRight);
+			//Debug.Log("eulerangles.y: " + gameObject.transform.eulerAngles.y);
+			//Debug.Log("lookingRight: " + lookingRight);
 			
 			if (lookingLeft && lookInput.x > 0)
 			{
-				Debug.Log("Rotate right");
+				//Debug.Log("Rotate right");
 				Vector3 newEulerAngles = new Vector3(0f, 90f, 0f);
 				gameObject.transform.eulerAngles = newEulerAngles;
 			}
 			
 			if(lookingRight && lookInput.x < 0)
 			{
-				Debug.Log("Rotate left");
+				//Debug.Log("Rotate left");
 				Vector3 newEulerAngles = new Vector3(0f, 270f, 0f);
 				gameObject.transform.eulerAngles = newEulerAngles;
 			}
@@ -71,9 +74,19 @@ public class PlayerController : MonoBehaviour
 		
 		//Firing Gun
 		fireGun = input.fire;
-		if(fireGun && !isFiring)
+		if(fireGun)
 		{
-			StartCoroutine(FireGun());
+			if(!isFiring)
+				StartCoroutine(FireGun());
+
+			if (!audioSourceGun.isPlaying)
+			{
+				audioSourceGun.PlayOneShot(gunAudio);
+			}
+		}
+		else
+		{
+			audioSourceGun.Stop();
 		}
 
 		//Firing jetpack
@@ -84,7 +97,7 @@ public class PlayerController : MonoBehaviour
 		}
 		else
 		{
-			audioSource.Stop();
+			audioSourceJet.Stop();
 			mainEngineParticles.Stop();
 		}
 
@@ -94,6 +107,8 @@ public class PlayerController : MonoBehaviour
 	{
 		Vector3 aimDir = (target.position - spawnBulletPosition.position).normalized;
 		Instantiate(bulletPF, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+		Vector3 recoilDir = new Vector3(-aimDir.x, -aimDir.y, 0f);
+		impactReceiver.AddImpact(recoilDir, gunRecoil);
 		isFiring = true;
 		fireGun = false;
 		yield return new WaitForSeconds(.1f);
@@ -105,9 +120,9 @@ public class PlayerController : MonoBehaviour
 		Vector3 jetVector = new Vector3(jetPack.up.x, jetPack.up.y, 0f);
 		impactReceiver.AddImpact(jetVector,mainThrust);
 
-		if (!audioSource.isPlaying)
+		if (!audioSourceJet.isPlaying)
 		{
-			audioSource.PlayOneShot(thrustAudio);
+			audioSourceJet.PlayOneShot(thrustAudio);
 		}
 		if(!mainEngineParticles.isPlaying)
 		{
