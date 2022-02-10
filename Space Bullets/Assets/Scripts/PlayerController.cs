@@ -102,7 +102,8 @@ public class PlayerController : MonoBehaviour
 
 	private void ApplyThrust()
 	{
-		impactReceiver.AddImpact(jetPack.up,mainThrust);
+		Vector3 jetVector = new Vector3(jetPack.up.x, jetPack.up.y, 0f);
+		impactReceiver.AddImpact(jetVector,mainThrust);
 
 		if (!audioSource.isPlaying)
 		{

@@ -123,7 +123,11 @@ namespace StarterAssets
 			
 			JumpAndGravity();
 			GroundedCheck();
-			Move();
+			if(Grounded)
+			{
+				Move();
+			}
+			
 		}
 
 		private void LateUpdate()
