@@ -19,7 +19,8 @@ public class BulletProjectile : MonoBehaviour
 
     private void Start()
     {
-        bulletRigidBody.velocity = transform.forward * speed;
+		Vector3 bulletTrajectory = new Vector3(transform.forward.x, transform.forward.y, 0f);
+        bulletRigidBody.velocity = bulletTrajectory * speed;
 
         StartCoroutine(WaitThenDestroy());
     }
