@@ -9,6 +9,7 @@ public class BulletProjectile : MonoBehaviour
     [SerializeField] private Transform vfxHitOther;
     [SerializeField] float speed = 5f;
     [SerializeField] int damage;
+
     private EnemyAI enemy;
 
     private void Awake()
@@ -19,11 +20,9 @@ public class BulletProjectile : MonoBehaviour
 
     private void Start()
     {
-		Vector3 bulletTrajectory = new Vector3(transform.forward.x, transform.forward.y, 0f);
-        bulletRigidBody.velocity = bulletTrajectory * speed;
 
-        StartCoroutine(WaitThenDestroy());
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -44,13 +43,24 @@ public class BulletProjectile : MonoBehaviour
             var missEffect = Instantiate(vfxHitOther, transform.position, Quaternion.identity);
             Destroy(missEffect.gameObject, 0.5f);
         }
-        Destroy(gameObject);
-    }
+        gameObject.SetActive(false);
+	}
+
+	public void InstantiateFromPool()
+	{
+		Vector3 bulletTrajectory = new Vector3(transform.forward.x, transform.forward.y, 0f);
+		bulletRigidBody.velocity = bulletTrajectory * speed;
+		gameObject.SetActive(true);
+		StartCoroutine(WaitThenDestroy());
+	}
 
     IEnumerator WaitThenDestroy()
     {
-        yield return new WaitForSeconds(3f);
-        if(gameObject != null)
-            Destroy(gameObject);
-    }
+        yield return new WaitForSeconds(2f);
+        if(gameObject.activeSelf == true)
+		{
+			gameObject.SetActive(false);
+		}
+
+	}
 }
