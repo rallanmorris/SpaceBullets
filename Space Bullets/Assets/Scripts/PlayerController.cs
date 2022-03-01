@@ -106,7 +106,16 @@ public class PlayerController : MonoBehaviour
 	IEnumerator FireGun()
 	{
 		Vector3 aimDir = (target.position - spawnBulletPosition.position).normalized;
-		Instantiate(bulletPF, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+		//Instantiate(bulletPF, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+
+		GameObject bullet = ObjectPool.SharedInstance.GetPooledObject();
+		if (bullet != null)
+		{
+			bullet.transform.position = spawnBulletPosition.position;
+			bullet.transform.rotation = Quaternion.LookRotation(aimDir, Vector3.up);
+			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();
+		}
+
 		Vector3 recoilDir = new Vector3(-aimDir.x, -aimDir.y, 0f);
 		impactReceiver.AddImpact(recoilDir, gunRecoil);
 		isFiring = true;
