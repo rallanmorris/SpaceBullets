@@ -5,7 +5,7 @@ using System.Collections;
 public class ImpactReceiver : MonoBehaviour
 {
 	float mass = 3.0F; // defines the character mass
-	Vector3 impact = Vector3.zero;
+	public Vector3 impact = Vector3.zero;
 	private CharacterController character;
 
 
@@ -35,6 +35,8 @@ public class ImpactReceiver : MonoBehaviour
 			Vector3 resetZ = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y, 0f);
 			this.gameObject.transform.position = resetZ;
 		}
+
+		Debug.Log("impact: " + impact);
 	}
 	// call this function to add an impact force:
 	public void AddImpact(Vector3 dir, float force)
@@ -42,5 +44,7 @@ public class ImpactReceiver : MonoBehaviour
 		dir.Normalize();
 		//if (dir.y < 0) dir.y = -dir.y; // reflect down force on the ground
 		impact += dir.normalized * force / mass;
+
+		
 	}
 }

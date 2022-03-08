@@ -7,9 +7,11 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] GameObject player;
 	[SerializeField] PlayerController playerController;
 	[SerializeField] Transform spawnBulletPosition;
+	[SerializeField] Transform spawnBulletPosition2;
 	[SerializeField] Transform bulletPF;
 
-	public Vector3 aimVector;
+	private Vector3 aimVector;
+	private Vector3 aimVector2;
 	private Vector3 playerPosition;
 	private bool isFiring = false;
 	private bool isSpinning;
@@ -37,29 +39,35 @@ public class EnemyAI : MonoBehaviour
 	}
 
 	[SerializeField] float followSpeed = 1f;
+	[SerializeField] float stopSpeed = 1f;
 	[SerializeField] float aimTime = 1f;
 	[SerializeField] float warmUpTime = 2f;
 	[SerializeField] float shootTime = 3f;
 	[SerializeField] float coolDownTime = 2f;
+	[SerializeField] float followRange = 7f;
 
-	private State _state;
-	private Combat combatState;
-	private float timer = 0f;
-
+	public State _state;
+	public Combat combatState;
+	public float timer = 0f;
+	public float stopTimer = 0f;
+	private Rigidbody enemyRigidbody;
 
 	// Start is called before the first frame update
 	void Start()
     {
+		enemyRigidbody = GetComponent<Rigidbody>();
 		_state = State.Patrol;
+		combatState = Combat.Aim;
 	}
 
     // Update is called once per frame
     void Update()
     {
 		//Check if player is within range
-		if (GetDistanceToPlayer() < 8 && _state != State.Combat)
+		if (GetDistanceToPlayer() < followRange && _state != State.Combat)
 		{
 			timer = 0f;
+			stopTimer = 0f;
 			_state = State.Combat;
 			combatState = Combat.Aim;
 			//isAttackingPlayer = true;
@@ -67,12 +75,13 @@ public class EnemyAI : MonoBehaviour
 			//StartCoroutine(AttackPlayer());
 		}
 
-		else if (GetDistanceToPlayer() >= 8 || GetDistanceToPlayer() < 15)
+		else if (GetDistanceToPlayer() >= followRange && GetDistanceToPlayer() < 50)
 		{
-			_state = State.FollowPlayer;
+			if(combatState == Combat.Aim)
+				_state = State.FollowPlayer;
 		}
 
-		if (GetDistanceToPlayer() >= 15)
+		if (GetDistanceToPlayer() >= 50)
 		{
 			_state = State.Patrol;
 		}
@@ -103,7 +112,19 @@ public class EnemyAI : MonoBehaviour
 	void FollowPlayer()
 	{
 		LookAtPlayer();
-		Vector3.MoveTowards(gameObject.transform.position, player.transform.position, followSpeed * Time.deltaTime);
+		//Vector3.MoveTowards(gameObject.transform.position, player.transform.position, followSpeed * Time.deltaTime);
+
+		Vector3 enemyTrajectory = new Vector3(transform.forward.x, transform.forward.y, 0f);
+		enemyRigidbody.velocity = enemyTrajectory * followSpeed;
+	}
+
+	void StopMoving()
+	{
+		stopTimer += Time.deltaTime * stopSpeed;
+		if (stopTimer > 1f)
+			stopTimer = 1f;
+		enemyRigidbody.velocity = Vector3.Lerp(transform.forward * followSpeed, Vector3.zero, stopTimer);
+		
 	}
 
 	void InCombat()
@@ -147,10 +168,12 @@ public class EnemyAI : MonoBehaviour
 		if(combatState == Combat.CoolDown)
 		{
 			StopSpinning();
+			StopMoving();
 			timer += Time.deltaTime;
 			if (timer > coolDownTime)
 			{
 				timer = 0f;
+				stopTimer = 0f;
 				combatState = Combat.Aim;
 			}
 		}
@@ -171,6 +194,7 @@ public class EnemyAI : MonoBehaviour
 	void UpdateAimVector()
 	{
 		aimVector = (player.transform.position - spawnBulletPosition.position).normalized;
+		aimVector2 = (player.transform.position - spawnBulletPosition2.position).normalized;
 	}
 
 	void LookAtPlayer()
@@ -197,6 +221,7 @@ public class EnemyAI : MonoBehaviour
 	{
 		if (!isFiring)
 			StartCoroutine(FireGun());
+
 	}
 
 	IEnumerator FireGun()
@@ -207,6 +232,14 @@ public class EnemyAI : MonoBehaviour
 			bullet.transform.position = spawnBulletPosition.position;
 			bullet.transform.rotation = Quaternion.LookRotation(aimVector, Vector3.up);
 			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();
+		}
+
+		GameObject bullet2 = ObjectPool.SharedInstance.GetPooledObject();
+		if (bullet != null)
+		{
+			bullet2.transform.position = spawnBulletPosition2.position;
+			bullet2.transform.rotation = Quaternion.LookRotation(aimVector2, Vector3.up);
+			bullet2.GetComponent<BulletProjectile>().InstantiateFromPool();
 		}
 		isFiring = true;
 		yield return new WaitForSeconds(.1f);

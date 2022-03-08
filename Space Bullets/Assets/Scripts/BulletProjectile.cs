@@ -28,7 +28,9 @@ public class BulletProjectile : MonoBehaviour
     {
         if (other.GetComponent<BulletTarget>() != null)
         {
-            //Hit
+			//Hit enemy
+			Debug.Log("hitting an enemy");
+			gameObject.SetActive(false);
 			/*
             enemy = other.gameObject.GetComponent<EnemyAI>();
             var hitEffect = Instantiate(vfxHitEnemy, transform.position, Quaternion.identity);
@@ -39,16 +41,30 @@ public class BulletProjectile : MonoBehaviour
                 enemy.TakeDamage(damage);
 
 			*/
-        }
+		}
+		else if(other.GetComponent<BulletProjectile>() != null)
+		{
+			//Hit another bullet
+			Debug.Log("hitting another bullet");
+		}
+		else if(other.GetComponent<PlayerController>() != null)
+		{
+			Debug.Log("hit player");
+		}
         else
         {
+			//Hit something else
+			Debug.Log("hitting something else");
+			gameObject.SetActive(false);
 			/*
-            //Hit something else
+            
             var missEffect = Instantiate(vfxHitOther, transform.position, Quaternion.identity);
             Destroy(missEffect.gameObject, 0.5f);
 			*/
-        }
-        gameObject.SetActive(false);
+		}
+
+		//Debug.Log("Hit Something");
+        //gameObject.SetActive(false);
 	}
 
 	public void InstantiateFromPool()

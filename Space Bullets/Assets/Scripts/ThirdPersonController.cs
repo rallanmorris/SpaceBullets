@@ -87,6 +87,7 @@ namespace StarterAssets
 		private CharacterController _controller;
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
+		private ImpactReceiver _impactReceiver;
 
 		private const float _threshold = 0.01f;
 
@@ -109,6 +110,7 @@ namespace StarterAssets
 			_controller = GetComponent<CharacterController>();
 			_input = GetComponent<StarterAssetsInputs>();
 			_playerInput = GetComponent<PlayerInput>();
+			_impactReceiver = GetComponent<ImpactReceiver>();
 
 			AssignAnimationIDs();
 
@@ -123,11 +125,23 @@ namespace StarterAssets
 			
 			JumpAndGravity();
 			GroundedCheck();
-			if(Grounded)
+			if (Grounded)
 			{
-				Move();
+				Vector3 roundedImpact = _impactReceiver.impact;
+				roundedImpact = new Vector3(Mathf.Round(roundedImpact.x), Mathf.Round(roundedImpact.y), Mathf.Round(roundedImpact.z));
+
+				if (roundedImpact == Vector3.zero)
+					Move();
 			}
+			else
+				OnlyApplyGravity();
 			
+		}
+
+		//Added in doesn't break
+		private void OnlyApplyGravity()
+		{
+			_controller.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
 
 		private void LateUpdate()

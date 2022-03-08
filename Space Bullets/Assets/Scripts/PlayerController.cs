@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
 	private bool isFiringJetPack = false;
 
 	public Vector2 lookInput;
+	public Vector3 recoilDir;
 
 	// Start is called before the first frame update
 	void Start()
@@ -116,7 +117,7 @@ public class PlayerController : MonoBehaviour
 			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();
 		}
 
-		Vector3 recoilDir = new Vector3(-aimDir.x, -aimDir.y, 0f);
+		recoilDir = new Vector3(-aimDir.x, -aimDir.y, 0f);
 		impactReceiver.AddImpact(recoilDir, gunRecoil);
 		isFiring = true;
 		fireGun = false;
