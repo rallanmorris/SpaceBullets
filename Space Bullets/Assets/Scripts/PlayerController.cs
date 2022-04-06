@@ -137,8 +137,9 @@ public class PlayerController : MonoBehaviour
 
 	private void ApplyThrust()
 	{
-		Vector3 jetVector = new Vector3(jetPack.up.x, jetPack.up.y, 0f);
-		impactReceiver.AddImpact(jetVector,mainThrust);
+		Vector3 aimDir = (target.position - spawnBulletPosition.position).normalized;
+		Vector3 jetVector = new Vector3(aimDir.x, aimDir.y, 0f);
+		impactReceiver.AddImpact(jetVector,mainThrust * .1f);
 
 		if (!audioSourceJet.isPlaying)
 		{

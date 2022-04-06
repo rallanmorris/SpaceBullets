@@ -1807,11 +1807,11 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: 4db5e14ad056c524bbe164dfb61c09ff, type: 3}
     - target: {fileID: 379274840, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       propertyPath: gunRecoil
-      value: 30
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 379274840, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       propertyPath: mainThrust
-      value: 3
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 379274840, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       propertyPath: thrustAudio
@@ -1940,6 +1940,26 @@ PrefabInstance:
     - target: {fileID: 8338988566280778637, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 9109049471675679051, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9109049471675679051, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9109049471675679051, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9109049471675679051, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9109049471675679051, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
