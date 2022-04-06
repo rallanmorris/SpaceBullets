@@ -47,33 +47,43 @@ public class PlayerController : MonoBehaviour
 		if(lookInput != Vector2.zero)
 		{
 			bool lookingLeft = (gameObject.transform.eulerAngles.y > 269);
-			//Debug.Log("lookingleft: " + lookingLeft);
+			Debug.Log("lookingleft: " + lookingLeft);
 			bool lookingRight = (gameObject.transform.eulerAngles.y < 91);
 			//Debug.Log("eulerangles.y: " + gameObject.transform.eulerAngles.y);
-			//Debug.Log("lookingRight: " + lookingRight);
-			
+			Debug.Log("lookingRight: " + lookingRight);
+
 			if (lookingLeft && lookInput.x > 0)
 			{
 				//Debug.Log("Rotate right");
 				Vector3 newEulerAngles = new Vector3(0f, 90f, 0f);
 				gameObject.transform.eulerAngles = newEulerAngles;
+				//aimParent.rotation = Quaternion.Euler(0f, -90f, 0f);
 			}
-			
-			if(lookingRight && lookInput.x < 0)
+
+			if (lookingRight && lookInput.x < 0)
 			{
 				//Debug.Log("Rotate left");
 				Vector3 newEulerAngles = new Vector3(0f, 270f, 0f);
 				gameObject.transform.eulerAngles = newEulerAngles;
 			}
-			
 
-			float inputAngle = Mathf.Atan2(lookInput.y,lookInput.x) * Mathf.Rad2Deg;
+			float inputAngle = Mathf.Atan2(lookInput.y, lookInput.x) * Mathf.Rad2Deg;
 			aimParent.rotation = Quaternion.Euler(0, 0, inputAngle);
 			Vector3 targetParentPos = new Vector3(aimSon.position.x, aimSon.position.y, targetParent.position.z);
 			targetParent.position = targetParentPos;
+
 		}
 		
 		//Firing Gun
+		if(input.fire || fireJetPack)
+		{
+			impactReceiver.StartImpact();
+		}
+		else
+		{
+			impactReceiver.StopImpact();
+		}
+
 		fireGun = input.fire;
 		if(fireGun)
 		{

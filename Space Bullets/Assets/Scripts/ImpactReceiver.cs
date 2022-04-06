@@ -6,7 +6,9 @@ public class ImpactReceiver : MonoBehaviour
 {
 	float mass = 3.0F; // defines the character mass
 	public Vector3 impact = Vector3.zero;
+	public float impactMagnitude;
 	private CharacterController character;
+	public bool impactStopped;
 
 
 	public float zPos;
@@ -22,11 +24,13 @@ public class ImpactReceiver : MonoBehaviour
 	{
 		//Debug
 		zPos = this.gameObject.transform.position.z;
+		impactMagnitude = impact.magnitude;
 
 		// apply the impact force:
 		if (impact.magnitude > 0.2F) character.Move(impact * Time.deltaTime);
 		// consumes the impact energy each cycle:
-		impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
+		if(impactStopped)
+			impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
 
 		//Resets z axis
 		if (zPos > 1f || zPos < -1f)
@@ -36,8 +40,21 @@ public class ImpactReceiver : MonoBehaviour
 			this.gameObject.transform.position = resetZ;
 		}
 
-		Debug.Log("impact: " + impact);
+		//Debug.Log("impact: " + impact);
 	}
+
+	//call this function to start consuming impact force every cycle
+	public void StopImpact()
+	{
+		impactStopped = true;
+	}
+
+	//call this function to keep impact force from being consumed every cycle
+	public void StartImpact()
+	{
+		impactStopped = false;
+	}
+
 	// call this function to add an impact force:
 	public void AddImpact(Vector3 dir, float force)
 	{

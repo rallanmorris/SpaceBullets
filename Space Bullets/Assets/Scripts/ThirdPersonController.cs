@@ -121,15 +121,18 @@ namespace StarterAssets
 
 		private void Update()
 		{
+			//Check for current impact force
+			Vector3 roundedImpact = _impactReceiver.impact;
+			roundedImpact = new Vector3(Mathf.Round(roundedImpact.x), Mathf.Round(roundedImpact.y), Mathf.Round(roundedImpact.z));
+
 			_hasAnimator = TryGetComponent(out _animator);
-			
-			JumpAndGravity();
+
+			if(roundedImpact == Vector3.zero)
+				JumpAndGravity();
+
 			GroundedCheck();
 			if (Grounded)
 			{
-				Vector3 roundedImpact = _impactReceiver.impact;
-				roundedImpact = new Vector3(Mathf.Round(roundedImpact.x), Mathf.Round(roundedImpact.y), Mathf.Round(roundedImpact.z));
-
 				if (roundedImpact == Vector3.zero)
 					Move();
 			}
