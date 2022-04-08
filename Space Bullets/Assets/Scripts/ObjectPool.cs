@@ -8,6 +8,7 @@ public class ObjectPool : MonoBehaviour
 	public List<GameObject> pooledObjects;
 	public GameObject objectToPool;
 	public int amountToPool;
+	[SerializeField] GameObject poolParent;
 
 	void Awake()
 	{
@@ -21,6 +22,7 @@ public class ObjectPool : MonoBehaviour
 			for(int i = 0; i < amountToPool; i++)
 			{
 				tmp = Instantiate(objectToPool);
+				tmp.transform.parent = poolParent.transform;
 				tmp.SetActive(false);
 				pooledObjects.Add(tmp);
 			}

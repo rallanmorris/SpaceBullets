@@ -47,10 +47,10 @@ public class PlayerController : MonoBehaviour
 		if(lookInput != Vector2.zero)
 		{
 			bool lookingLeft = (gameObject.transform.eulerAngles.y > 269);
-			Debug.Log("lookingleft: " + lookingLeft);
+			//Debug.Log("lookingleft: " + lookingLeft);
 			bool lookingRight = (gameObject.transform.eulerAngles.y < 91);
 			//Debug.Log("eulerangles.y: " + gameObject.transform.eulerAngles.y);
-			Debug.Log("lookingRight: " + lookingRight);
+			//Debug.Log("lookingRight: " + lookingRight);
 
 			if (lookingLeft && lookInput.x > 0)
 			{
@@ -122,6 +122,7 @@ public class PlayerController : MonoBehaviour
 		GameObject bullet = ObjectPool.SharedInstance.GetPooledObject();
 		if (bullet != null)
 		{
+			bullet.GetComponent<BulletProjectile>().EnemyShot(false);
 			bullet.transform.position = spawnBulletPosition.position;
 			bullet.transform.rotation = Quaternion.LookRotation(aimDir, Vector3.up);
 			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();

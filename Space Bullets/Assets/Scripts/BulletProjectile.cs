@@ -8,7 +8,8 @@ public class BulletProjectile : MonoBehaviour
     //[SerializeField] private Transform vfxHitEnemy;
     //[SerializeField] private Transform vfxHitOther;
     [SerializeField] float speed = 5f;
-    [SerializeField] int damage;
+    [SerializeField] int damage = 1;
+	private bool isEnemyBullet = false;
 
     private EnemyAI enemy;
 
@@ -23,24 +24,27 @@ public class BulletProjectile : MonoBehaviour
 
     }
 
+	public void EnemyShot(bool isEnemyShot)
+	{
+		isEnemyBullet = isEnemyShot;
+	}
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<BulletTarget>() != null)
+        if (other.GetComponent<BulletTarget>() != null && !isEnemyBullet)
         {
 			//Hit enemy
-			Debug.Log("hitting an enemy");
+			Debug.Log("hit an enemy");
 			gameObject.SetActive(false);
-			/*
+			
             enemy = other.gameObject.GetComponent<EnemyAI>();
-            var hitEffect = Instantiate(vfxHitEnemy, transform.position, Quaternion.identity);
-            hitEffect.transform.parent = enemy.transform;
-            Destroy(hitEffect.gameObject, 0.2f);
+            //var hitEffect = Instantiate(vfxHitEnemy, transform.position, Quaternion.identity);
+            //hitEffect.transform.parent = enemy.transform;
+            //Destroy(hitEffect.gameObject, 0.2f);
 
             if (enemy != null)
                 enemy.TakeDamage(damage);
 
-			*/
 		}
 		else if(other.GetComponent<BulletProjectile>() != null)
 		{
@@ -50,6 +54,7 @@ public class BulletProjectile : MonoBehaviour
 		else if(other.GetComponent<PlayerController>() != null)
 		{
 			Debug.Log("hit player");
+			gameObject.SetActive(false);
 		}
         else
         {
@@ -77,7 +82,7 @@ public class BulletProjectile : MonoBehaviour
 
     IEnumerator WaitThenDestroy()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
         if(gameObject.activeSelf == true)
 		{
 			gameObject.SetActive(false);

@@ -6,9 +6,11 @@ public class EnemyAI : MonoBehaviour
 {
 	[SerializeField] GameObject player;
 	[SerializeField] PlayerController playerController;
+	[SerializeField] MeshDestroy meshDestroyer;
 	[SerializeField] Transform spawnBulletPosition;
 	[SerializeField] Transform spawnBulletPosition2;
 	[SerializeField] Transform bulletPF;
+	[SerializeField] int health = 1;
 
 	private Vector3 aimVector;
 	private Vector3 aimVector2;
@@ -17,6 +19,7 @@ public class EnemyAI : MonoBehaviour
 	private bool isSpinning;
 	private bool isStoppedSpinning;
 	private bool isAttackingPlayer;
+	private bool isAlreadyDead;
 
 	[SerializeField] float lookSpeed = 2f;
 
@@ -27,7 +30,7 @@ public class EnemyAI : MonoBehaviour
 		Patrol,
 		FollowPlayer,
 		Combat,
-		Die
+		Death
 	}
 
 	public enum Combat
@@ -45,6 +48,7 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] float shootTime = 3f;
 	[SerializeField] float coolDownTime = 2f;
 	[SerializeField] float followRange = 7f;
+	[SerializeField] float deathTime = 5f;
 
 	public State _state;
 	public Combat combatState;
@@ -55,6 +59,8 @@ public class EnemyAI : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
+		isAlreadyDead = false;
+
 		enemyRigidbody = GetComponent<Rigidbody>();
 		_state = State.Patrol;
 		combatState = Combat.Aim;
@@ -63,8 +69,12 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		//Check if dead
+		if (health < 1)
+			_state = State.Death;
+
 		//Check if player is within range
-		if (GetDistanceToPlayer() < followRange && _state != State.Combat)
+		if (GetDistanceToPlayer() < followRange && _state != State.Combat && _state != State.Death)
 		{
 			timer = 0f;
 			stopTimer = 0f;
@@ -75,13 +85,13 @@ public class EnemyAI : MonoBehaviour
 			//StartCoroutine(AttackPlayer());
 		}
 
-		else if (GetDistanceToPlayer() >= followRange && GetDistanceToPlayer() < 50)
+		else if (GetDistanceToPlayer() >= followRange && GetDistanceToPlayer() < 50 && _state != State.Death)
 		{
 			if(combatState == Combat.Aim)
 				_state = State.FollowPlayer;
 		}
 
-		if (GetDistanceToPlayer() >= 50)
+		if (GetDistanceToPlayer() >= 50 && _state != State.Death)
 		{
 			_state = State.Patrol;
 		}
@@ -97,7 +107,7 @@ public class EnemyAI : MonoBehaviour
 			case State.Combat:
 				InCombat();
 				break;
-			case State.Die:
+			case State.Death:
 				Die();
 				break;
 		}
@@ -181,7 +191,20 @@ public class EnemyAI : MonoBehaviour
 
 	void Die()
 	{
-		//TODO
+		if(!isAlreadyDead)
+		{
+			meshDestroyer.DestroyMesh();
+			isAlreadyDead = true;
+			timer = 0;
+		}
+		else
+		{
+			timer += Time.deltaTime;
+			if (timer > deathTime)
+				Destroy(gameObject);
+		}
+		
+
 	}
 
 	public float GetDistanceToPlayer()
@@ -229,14 +252,16 @@ public class EnemyAI : MonoBehaviour
 		GameObject bullet = ObjectPool.SharedInstance.GetPooledObject();
 		if (bullet != null)
 		{
+			bullet.GetComponent<BulletProjectile>().EnemyShot(true);
 			bullet.transform.position = spawnBulletPosition.position;
 			bullet.transform.rotation = Quaternion.LookRotation(aimVector, Vector3.up);
 			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();
 		}
 
 		GameObject bullet2 = ObjectPool.SharedInstance.GetPooledObject();
-		if (bullet != null)
+		if (bullet2 != null)
 		{
+			bullet2.GetComponent<BulletProjectile>().EnemyShot(true);
 			bullet2.transform.position = spawnBulletPosition2.position;
 			bullet2.transform.rotation = Quaternion.LookRotation(aimVector2, Vector3.up);
 			bullet2.GetComponent<BulletProjectile>().InstantiateFromPool();
@@ -249,6 +274,7 @@ public class EnemyAI : MonoBehaviour
 
 	public void TakeDamage(int dmg)
     {
-
+		health -= dmg;
+		Debug.Log("Enemy Health:" + health);
     }
 }
