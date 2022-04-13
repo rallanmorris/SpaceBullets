@@ -12,6 +12,7 @@ public class BulletProjectile : MonoBehaviour
 	private bool isEnemyBullet = false;
 
     private EnemyAI enemy;
+	private PlayerController player;
 
     private void Awake()
     {
@@ -55,6 +56,10 @@ public class BulletProjectile : MonoBehaviour
 		{
 			Debug.Log("hit player");
 			gameObject.SetActive(false);
+
+			player = other.gameObject.GetComponent<PlayerController>();
+			if (player != null)
+				player.TakeDamage(damage);
 		}
         else
         {

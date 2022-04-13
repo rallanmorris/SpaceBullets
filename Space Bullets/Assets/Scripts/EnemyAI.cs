@@ -73,29 +73,36 @@ public class EnemyAI : MonoBehaviour
 		if (health < 1)
 			_state = State.Death;
 
-		//Check if player is within range
-		if (GetDistanceToPlayer() < followRange && _state != State.Combat && _state != State.Death)
+		if (!playerController.isDead)
 		{
-			timer = 0f;
-			stopTimer = 0f;
-			_state = State.Combat;
-			combatState = Combat.Aim;
-			//isAttackingPlayer = true;
-			//UpdateAimVector();
-			//StartCoroutine(AttackPlayer());
+			//Check if player is within range
+			if (GetDistanceToPlayer() < followRange && _state != State.Combat && _state != State.Death)
+			{
+				timer = 0f;
+				stopTimer = 0f;
+				_state = State.Combat;
+				combatState = Combat.Aim;
+				//isAttackingPlayer = true;
+				//UpdateAimVector();
+				//StartCoroutine(AttackPlayer());
+			}
+
+			else if (GetDistanceToPlayer() >= followRange && GetDistanceToPlayer() < 50 && _state != State.Death)
+			{
+				if (combatState == Combat.Aim)
+					_state = State.FollowPlayer;
+			}
+
+			if (GetDistanceToPlayer() >= 50 && _state != State.Death)
+			{
+				_state = State.Patrol;
+			}
 		}
 
-		else if (GetDistanceToPlayer() >= followRange && GetDistanceToPlayer() < 50 && _state != State.Death)
-		{
-			if(combatState == Combat.Aim)
-				_state = State.FollowPlayer;
-		}
-
-		if (GetDistanceToPlayer() >= 50 && _state != State.Death)
+		else
 		{
 			_state = State.Patrol;
 		}
-
 		switch (_state)
 		{
 			case State.Patrol:
@@ -111,6 +118,7 @@ public class EnemyAI : MonoBehaviour
 				Die();
 				break;
 		}
+		
 		
     }
 
