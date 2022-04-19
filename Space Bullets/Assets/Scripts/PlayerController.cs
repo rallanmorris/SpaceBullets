@@ -19,11 +19,17 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] float gunRecoil = 40f;
 	[SerializeField] float health = 40;
 	[SerializeField] Transform jetPack;
+
 	[SerializeField] ParticleSystem mainEngineParticles;
 	[SerializeField] ParticleSystem deathParticles;
+	[SerializeField] ParticleSystem bigFireParticles;
+	[SerializeField] ParticleSystem smallFireParticles;
+	[SerializeField] ParticleSystem sparkParticles;
+
 	[SerializeField] GameObject playerMesh;
 	[SerializeField] GameObject gun;
 	[SerializeField] GameObject playerCamRoot;
+	[SerializeField] GameObject damageIndicatorSprite;
 	private Vector3 deathPos;
 
 	[SerializeField] AudioClip thrustAudio;
@@ -37,6 +43,7 @@ public class PlayerController : MonoBehaviour
 	private bool isFiringJetPack = false;
 
 	public bool isDead;
+	private bool isDying;
 	private float startHealth;
 
 	public Vector2 lookInput;
@@ -46,7 +53,9 @@ public class PlayerController : MonoBehaviour
 	void Start()
 	{
 		isDead = false;
+		isDying = false;
 		startHealth = health;
+		damageIndicatorSprite.SetActive(false);
 		//audioSourceJet = GetComponent<AudioSource>();
 	}
 
@@ -125,11 +134,25 @@ public class PlayerController : MonoBehaviour
 				mainEngineParticles.Stop();
 			}
 
+			//Setting on fire if dying
+			if(isDying)
+			{
+				if(!bigFireParticles.isPlaying)
+					bigFireParticles.Play();
+			}
+			else
+			{
+				if(!bigFireParticles.isStopped)
+					bigFireParticles.Stop();
+			}
+
 		}
 
 		else
 		{
 			playerCamRoot.transform.position = deathPos;
+			if (!bigFireParticles.isStopped && bigFireParticles != null)
+				bigFireParticles.Stop();
 		}
 
 	}
@@ -183,21 +206,44 @@ public class PlayerController : MonoBehaviour
 		if((health/startHealth) < 1f && (health / startHealth) > 0.5f)
 		{
 			//Start being mildly on fire
+			if (!sparkParticles.isPlaying)
+				sparkParticles.Play();
 			Debug.Log("Player is mildly hurt");
 		}
 		else if ((health/startHealth) < 0.5f && (health/startHealth) > 0.2f)
 		{
+			if (!sparkParticles.isStopped)
+				sparkParticles.Stop();
+
 			//Start being medium on fire
+			if (!smallFireParticles.isPlaying)
+				smallFireParticles.Play();
+
 			Debug.Log("Player is not doing so good");
 		}
 		else if ((health / startHealth) < 0.2f)
 		{
+			if (!sparkParticles.isStopped)
+				sparkParticles.Stop();
+			if (!smallFireParticles.isStopped)
+				smallFireParticles.Stop();
+
 			//Start being majorly on fire
+			isDying = true;
 			Debug.Log("Player is about to die");
 		}
 
+		StartCoroutine(IndicateDamage());
+
 		if (health <= 0)
 			Die();
+	}
+
+	IEnumerator IndicateDamage()
+	{
+		damageIndicatorSprite.SetActive(true);
+		yield return new WaitForSeconds(.1f);
+		damageIndicatorSprite.SetActive(false);
 	}
 
 	private void Die()

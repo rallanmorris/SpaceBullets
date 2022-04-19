@@ -7,6 +7,10 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] GameObject player;
 	[SerializeField] PlayerController playerController;
 	[SerializeField] MeshDestroy meshDestroyer;
+
+	[SerializeField] ParticleSystem deathParticles;
+	[SerializeField] ParticleSystem fireParticles;
+
 	[SerializeField] Transform spawnBulletPosition;
 	[SerializeField] Transform spawnBulletPosition2;
 	[SerializeField] Transform bulletPF;
@@ -97,6 +101,9 @@ public class EnemyAI : MonoBehaviour
 			{
 				_state = State.Patrol;
 			}
+
+			fireParticles.transform.position = gameObject.transform.position;
+			deathParticles.transform.position = gameObject.transform.position;
 		}
 
 		else
@@ -132,7 +139,7 @@ public class EnemyAI : MonoBehaviour
 		LookAtPlayer();
 		//Vector3.MoveTowards(gameObject.transform.position, player.transform.position, followSpeed * Time.deltaTime);
 
-		Vector3 enemyTrajectory = new Vector3(transform.forward.x, transform.forward.y, 0f);
+		Vector3 enemyTrajectory = new Vector3(gameObject.transform.forward.x, gameObject.transform.forward.y, 0f);
 		enemyRigidbody.velocity = enemyTrajectory * followSpeed;
 	}
 
@@ -201,6 +208,11 @@ public class EnemyAI : MonoBehaviour
 	{
 		if(!isAlreadyDead)
 		{
+			if (!fireParticles.isStopped)
+				fireParticles.Stop();
+			if (!deathParticles.isPlaying)
+				deathParticles.Play();
+
 			meshDestroyer.DestroyMesh();
 			isAlreadyDead = true;
 			timer = 0;
@@ -233,18 +245,18 @@ public class EnemyAI : MonoBehaviour
 		Vector3 lookDir = player.transform.position - gameObject.transform.position;
 		lookDir.z = 0;
 		Quaternion lookRotation = Quaternion.LookRotation(lookDir);
-		transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, lookRotation, lookSpeed * Time.deltaTime);
+		gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, lookRotation, lookSpeed * Time.deltaTime);
 	}
 
 	void Spin()
 	{
-		transform.Rotate(0, 0, 720* Time.deltaTime ); //rotates 7200 degrees per second around z axis
+		gameObject.transform.Rotate(0, 0, 720* Time.deltaTime ); //rotates 7200 degrees per second around z axis
 
 	}
 
 	void StopSpinning()
 	{
-		transform.Rotate(0, 0, 0); //rotates 0 degrees per second around z axis
+		gameObject.transform.Rotate(0, 0, 0); //rotates 0 degrees per second around z axis
 
 	}
 
@@ -284,5 +296,8 @@ public class EnemyAI : MonoBehaviour
     {
 		health -= dmg;
 		Debug.Log("Enemy Health:" + health);
+
+		if (!fireParticles.isPlaying)
+			fireParticles.Play();
     }
 }
