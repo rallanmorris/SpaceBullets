@@ -7,6 +7,7 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] GameObject player;
 	[SerializeField] PlayerController playerController;
 	[SerializeField] MeshDestroy meshDestroyer;
+	[SerializeField] GameController gameController;
 
 	[SerializeField] ParticleSystem deathParticles;
 	[SerializeField] ParticleSystem fireParticles;
@@ -19,6 +20,7 @@ public class EnemyAI : MonoBehaviour
 	private Vector3 aimVector;
 	private Vector3 aimVector2;
 	private Vector3 playerPosition;
+	private Vector3 patrolVector;
 	private bool isFiring = false;
 	private bool isSpinning;
 	private bool isStoppedSpinning;
@@ -68,6 +70,7 @@ public class EnemyAI : MonoBehaviour
 		enemyRigidbody = GetComponent<Rigidbody>();
 		_state = State.Patrol;
 		combatState = Combat.Aim;
+		patrolVector = Vector3.left;
 	}
 
     // Update is called once per frame
@@ -129,9 +132,19 @@ public class EnemyAI : MonoBehaviour
 		
     }
 
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.GetComponent<Border>() != null && _state == State.Patrol)
+		{
+			patrolVector = patrolVector * -1;
+		}
+	}
+
 	void Patrol()
 	{
-		//TODO
+		Quaternion lookRotation = Quaternion.LookRotation(patrolVector);
+		gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, lookRotation, lookSpeed * Time.deltaTime);
+		enemyRigidbody.velocity = patrolVector * followSpeed;
 	}
 
 	void FollowPlayer()
@@ -206,7 +219,7 @@ public class EnemyAI : MonoBehaviour
 
 	void Die()
 	{
-		if(!isAlreadyDead)
+		if (!isAlreadyDead)
 		{
 			if (!fireParticles.isStopped)
 				fireParticles.Stop();
@@ -221,7 +234,10 @@ public class EnemyAI : MonoBehaviour
 		{
 			timer += Time.deltaTime;
 			if (timer > deathTime)
-				Destroy(gameObject);
+			{
+				gameController.KillEnemy(transform.parent.gameObject);
+			}
+			
 		}
 		
 

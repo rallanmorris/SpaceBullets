@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] Transform aimSon;
 	[SerializeField] Transform targetParent;
 	[SerializeField] Transform target;
-	[SerializeField] Transform spawnBulletPosition;
+	[SerializeField] Transform spawnBulletTransform;
 	[SerializeField] Transform bulletPF;
 	[SerializeField] StarterAssetsInputs input;
 	[SerializeField] ImpactReceiver impactReceiver;
@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
 	private bool isFiringJetPack = false;
 
 	public bool isDead;
+	public bool isImmortal;
 	private bool isDying;
 	private float startHealth;
 
@@ -151,22 +152,20 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			playerCamRoot.transform.position = deathPos;
-			if (!bigFireParticles.isStopped && bigFireParticles != null)
-				bigFireParticles.Stop();
 		}
 
 	}
 
 	IEnumerator FireGun()
 	{
-		Vector3 aimDir = (target.position - spawnBulletPosition.position).normalized;
+		Vector3 aimDir = (target.position - spawnBulletTransform.position).normalized;
 		//Instantiate(bulletPF, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
 
 		GameObject bullet = ObjectPool.SharedInstance.GetPooledObject();
 		if (bullet != null)
 		{
 			bullet.GetComponent<BulletProjectile>().EnemyShot(false);
-			bullet.transform.position = spawnBulletPosition.position;
+			bullet.transform.position = new Vector3(spawnBulletTransform.position.x, spawnBulletTransform.position.y, 0f);
 			bullet.transform.rotation = Quaternion.LookRotation(aimDir, Vector3.up);
 			bullet.GetComponent<BulletProjectile>().InstantiateFromPool();
 		}
@@ -181,7 +180,7 @@ public class PlayerController : MonoBehaviour
 
 	private void ApplyThrust()
 	{
-		Vector3 aimDir = (target.position - spawnBulletPosition.position).normalized;
+		Vector3 aimDir = (target.position - spawnBulletTransform.position).normalized;
 		Vector3 jetVector = new Vector3(aimDir.x, aimDir.y, 0f);
 		impactReceiver.AddImpact(jetVector,mainThrust * .1f);
 
@@ -235,7 +234,7 @@ public class PlayerController : MonoBehaviour
 
 		StartCoroutine(IndicateDamage());
 
-		if (health <= 0)
+		if (health <= 0 && !isImmortal)
 			Die();
 	}
 
@@ -257,5 +256,12 @@ public class PlayerController : MonoBehaviour
 		playerMesh.SetActive(false);
 		gun.SetActive(false);
 		jetPack.gameObject.SetActive(false);
+
+		if (!sparkParticles.isStopped && sparkParticles != null)
+			sparkParticles.Stop();
+		if (!smallFireParticles.isStopped && smallFireParticles != null)
+			smallFireParticles.Stop();
+		if (!bigFireParticles.isStopped && bigFireParticles != null)
+			bigFireParticles.Stop();
 	}
 }

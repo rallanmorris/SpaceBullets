@@ -11,7 +11,7 @@ public class BulletProjectile : MonoBehaviour
     [SerializeField] int damage = 1;
 	private bool isEnemyBullet = false;
 
-    private EnemyAI enemy;
+	private EnemyAI enemy;
 	private PlayerController player;
 
     private void Awake()
@@ -30,21 +30,24 @@ public class BulletProjectile : MonoBehaviour
 		isEnemyBullet = isEnemyShot;
 	}
 
-    private void OnTriggerEnter(Collider other)
+	private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<BulletTarget>() != null && !isEnemyBullet)
+        if (other.GetComponent<BulletTarget>() != null)
         {
 			//Hit enemy
 			Debug.Log("hit an enemy");
-			gameObject.SetActive(false);
+
 			
             enemy = other.gameObject.GetComponent<EnemyAI>();
             //var hitEffect = Instantiate(vfxHitEnemy, transform.position, Quaternion.identity);
             //hitEffect.transform.parent = enemy.transform;
             //Destroy(hitEffect.gameObject, 0.2f);
 
-            if (enemy != null)
+            if (enemy != null && !isEnemyBullet)
+			{
                 enemy.TakeDamage(damage);
+				gameObject.SetActive(false);
+			}
 
 		}
 		else if(other.GetComponent<BulletProjectile>() != null)
@@ -55,16 +58,18 @@ public class BulletProjectile : MonoBehaviour
 		else if(other.GetComponent<PlayerController>() != null)
 		{
 			Debug.Log("hit player");
-			gameObject.SetActive(false);
 
 			player = other.gameObject.GetComponent<PlayerController>();
-			if (player != null)
+			if (player != null && isEnemyBullet)
+			{
 				player.TakeDamage(damage);
+				gameObject.SetActive(false);
+			}
 		}
         else
         {
 			//Hit something else
-			Debug.Log("hitting something else");
+			Debug.Log("hitting " + other.tag);
 			gameObject.SetActive(false);
 			/*
             
@@ -87,7 +92,7 @@ public class BulletProjectile : MonoBehaviour
 
     IEnumerator WaitThenDestroy()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(5f);
         if(gameObject.activeSelf == true)
 		{
 			gameObject.SetActive(false);

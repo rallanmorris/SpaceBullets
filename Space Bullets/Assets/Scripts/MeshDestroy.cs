@@ -32,7 +32,10 @@ public class MeshDestroy : MonoBehaviour
 		{
 			deathTimer += Time.deltaTime;
 			if (deathTimer > deathTime)
+			{
 				Destroy(gameObject);
+			}
+				
 		}
 	}
 
@@ -282,6 +285,7 @@ public class MeshDestroy : MonoBehaviour
 			GameObject.transform.position = original.transform.position;
 			GameObject.transform.rotation = original.transform.rotation;
 			GameObject.transform.localScale = original.transform.localScale;
+
 
 			var mesh = new Mesh();
 			mesh.name = original.GetComponent<MeshFilter>().mesh.name;
