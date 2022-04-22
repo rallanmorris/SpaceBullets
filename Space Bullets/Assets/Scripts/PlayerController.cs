@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] AudioClip gunAudio;
 	[SerializeField] AudioSource audioSourceJet;
 	[SerializeField] AudioSource audioSourceGun;
+
+	//private Transform playerTransform;
+
 	private bool fireGun = false;
 	private bool isFiring = false;
 
@@ -57,6 +60,7 @@ public class PlayerController : MonoBehaviour
 		isDying = false;
 		startHealth = health;
 		damageIndicatorSprite.SetActive(false);
+		//playerTransform = gameObject.transform;
 		//audioSourceJet = GetComponent<AudioSource>();
 	}
 
@@ -136,14 +140,14 @@ public class PlayerController : MonoBehaviour
 			}
 
 			//Setting on fire if dying
-			if(isDying)
+			if (isDying)
 			{
-				if(!bigFireParticles.isPlaying)
+				if (!bigFireParticles.isPlaying)
 					bigFireParticles.Play();
 			}
 			else
 			{
-				if(!bigFireParticles.isStopped)
+				if (!bigFireParticles.isStopped)
 					bigFireParticles.Stop();
 			}
 
@@ -182,17 +186,17 @@ public class PlayerController : MonoBehaviour
 	{
 		Vector3 aimDir = (target.position - spawnBulletTransform.position).normalized;
 		Vector3 jetVector = new Vector3(aimDir.x, aimDir.y, 0f);
-		impactReceiver.AddImpact(jetVector,mainThrust * .1f);
+		impactReceiver.AddImpact(jetVector, mainThrust * .1f);
 
 		if (!audioSourceJet.isPlaying)
 		{
 			audioSourceJet.PlayOneShot(thrustAudio);
 		}
-		if(!mainEngineParticles.isPlaying)
+		if (!mainEngineParticles.isPlaying)
 		{
 			mainEngineParticles.Play();
 		}
-		
+
 	}
 
 	public void TakeDamage(int dmg)
@@ -200,16 +204,16 @@ public class PlayerController : MonoBehaviour
 		health -= dmg;
 		Debug.Log("Player Health: " + health);
 
-		Debug.Log("Player Health Ratio: " + health/startHealth);
-		
-		if((health/startHealth) < 1f && (health / startHealth) > 0.5f)
+		Debug.Log("Player Health Ratio: " + health / startHealth);
+
+		if ((health / startHealth) < 1f && (health / startHealth) > 0.5f)
 		{
 			//Start being mildly on fire
 			if (!sparkParticles.isPlaying)
 				sparkParticles.Play();
 			Debug.Log("Player is mildly hurt");
 		}
-		else if ((health/startHealth) < 0.5f && (health/startHealth) > 0.2f)
+		else if ((health / startHealth) < 0.5f && (health / startHealth) > 0.2f)
 		{
 			if (!sparkParticles.isStopped)
 				sparkParticles.Stop();
@@ -247,7 +251,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Die()
 	{
-		if(!deathParticles.isPlaying && !isDead)
+		if (!deathParticles.isPlaying && !isDead)
 			deathParticles.Play();
 
 		isDead = true;
@@ -264,4 +268,5 @@ public class PlayerController : MonoBehaviour
 		if (!bigFireParticles.isStopped && bigFireParticles != null)
 			bigFireParticles.Stop();
 	}
+
 }
