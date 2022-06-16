@@ -53,6 +53,15 @@ public class PlayerController : MonoBehaviour
 	public Vector2 lookInput;
 	public Vector3 recoilDir;
 
+	public enum Zone
+	{
+		LowerSky,
+		UpperSky,
+		Space
+	}
+
+	public Zone _zone;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -267,6 +276,16 @@ public class PlayerController : MonoBehaviour
 			smallFireParticles.Stop();
 		if (!bigFireParticles.isStopped && bigFireParticles != null)
 			bigFireParticles.Stop();
+	}
+
+	public Zone GetZone()
+	{
+		return _zone;
+	}
+
+	public void SetZone(Zone newZone)
+	{
+		_zone = newZone;
 	}
 
 }
