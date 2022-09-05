@@ -33,7 +33,11 @@ public class Border : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-		if(isLeftBorder)
+		playerController = gameController.GetPlayer().GetComponent<PlayerController>();
+		characterController = gameController.GetPlayer().GetComponent<CharacterController>();
+		playerTransform = characterController.gameObject.transform;
+
+		if (isLeftBorder)
 		{
 			leftX = gameObject.transform.position.x;
 			rightX = rightBorder.gameObject.transform.position.x;
@@ -86,7 +90,8 @@ public class Border : MonoBehaviour
 
 			else if (isTopBorderLowerSky)
 			{
-				if(playerController.GetZone() == PlayerController.Zone.LowerSky)
+				Debug.Log("hit lower sky top border");
+				if (playerController.GetZone() == PlayerController.Zone.LowerSky)
 				{
 					playerController.SetZone(PlayerController.Zone.UpperSky);
 				}
@@ -106,17 +111,20 @@ public class Border : MonoBehaviour
 
 			else if (isTopBorderUpperSky)
 			{
+				Debug.Log("hit upper sky top border");
 				if (playerController.GetZone() == PlayerController.Zone.UpperSky)
 				{
-					if(gameController.playerHeight >= gameController.spaceHeight)
+					if (gameController.playerHeight >= gameController.spaceHeight)
 						playerController.SetZone(PlayerController.Zone.Space);
-					else if(gameController.playerHeight < gameController.spaceHeight)
+					else if (gameController.playerHeight < gameController.spaceHeight)
 					{
 						Vector3 topPos = new Vector3(playerTransform.position.x, lowerY + 10f, playerTransform.position.z);
 						playerTransform.position = topPos;
 						gameController.yOffset += 990;
-						Debug.Log("moving player to lower sky border" + topPos);
+						Debug.Log("moving player to lower sky border: " + topPos);
 					}
+					else
+						Debug.Log("Something weird is happening");
 				}
 				else if (playerController.GetZone() == PlayerController.Zone.Space)
 				{
@@ -157,6 +165,13 @@ public class Border : MonoBehaviour
 			enableCharacterControllerFlag = false;
 		}
     }
+
+	public void TriggerBorderHit()
+	{
+		Debug.Log("hit Border");
+		borderHit = true;
+		characterController.enabled = false;
+	}
 
 	private void OnTriggerEnter(Collider other)
 	{

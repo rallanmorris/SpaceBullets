@@ -32,6 +32,7 @@ public class ImpactReceiver : MonoBehaviour
 		if(impactStopped)
 			impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
 
+		/*
 		//Resets z axis
 		if (zPos > 1f || zPos < -1f)
 		{
@@ -39,7 +40,7 @@ public class ImpactReceiver : MonoBehaviour
 			Vector3 resetZ = new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y, 0f);
 			this.gameObject.transform.position = resetZ;
 		}
-
+		*/
 		//Debug.Log("impact: " + impact);
 	}
 
